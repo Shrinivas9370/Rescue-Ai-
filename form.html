@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Secure Profile Registration | Rescue ID</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+
+
+        function displayQR(event) {
+            event.preventDefault();
+            try {
+                // 1. Get elements
+                const fname = document.getElementById('fname').value;
+                const dob = document.getElementById('dob').value;
+                const bio = document.getElementById('bio').value;
+                const fb = document.getElementById('facebook').value;
+                const num = document.getElementById('number').value;
+
+                // 2. Validate - QR APIs will fail if data is empty
+                if (!fname) {
+                    alert("Please at least enter a name.");
+                    return;
+                }
+
+                // 3. Build the data string
+                const qrData = `Name: ${fname}\nDOB: ${dob}\nBio: ${bio}\nFB: ${fb}\nTel: ${num}`;
+                console.log("Data to encode:", qrData); // Debug 2
+
+                // 4. Construct URL
+                const size = "300x300";
+                const baseUrl = "https://api.qrserver.com/v1/create-qr-code/";
+                const finalUrl = `${baseUrl}?size=${size}&data=${encodeURIComponent(qrData)}`;
+
+                // 5. Update DOM
+                const qrImage = document.getElementById('qrImage');
+                // const loadingText = document.getElementById('loadingText');
+
+                qrImage.src = finalUrl;
+                const qrContainer = document.getElementById('qr-container');
+                qrContainer.style.display = "block"
+
+                // This ensures the image only shows once it's actually finished downloading
+                qrImage.onload = function () {
+                    qrImage.style.display = "inline-block";
+                    // loadingText.style.display = "none";
+                    console.log("QR Code successfully loaded!"); // Debug 3
+                };
+
+                qrImage.onerror = function () {
+                    console.error("The API failed to return an image.");
+                    alert("Failed to load QR code. Check your internet connection.");
+                };
+
+            } catch (error) {
+                console.error("JavaScript Error:", error);
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-gradient {
+            background: linear-gradient(180deg, rgba(19, 127, 236, 0.05) 0%, rgba(16, 25, 34, 0) 100%);
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen font-display">
+    <!-- Header / Navigation -->
+    <header
+        class="border-b border-primary/10 bg-background-light/50 dark:bg-background-dark/50 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-primary rounded flex items-center justify-center">
+                    <span class="material-icons text-white text-xl">qr_code_2</span>
+                </div>
+                <span class="font-bold text-xl tracking-tight text-slate-900 dark:text-white">RESCUE<span
+                        class="text-primary text-sm align-top ml-0.5">ID</span></span>
+            </div>
+            <div class="flex items-center gap-4 text-xs font-medium uppercase tracking-widest text-primary">
+                <span class="flex items-center gap-1">
+                    <span class="material-icons text-sm">lock</span>
+                    End-to-End Encrypted
+                </span>
+            </div>
+        </div>
+    </header>
+    <main class="max-w-7xl mx-auto px-4 py-12">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+            <!-- Main Registration Form -->
+            <div class="lg:col-span-8 space-y-8">
+                <section>
+                    <h1 class="text-3xl font-bold mb-2">Create Secure Identity Profile</h1>
+                    <p class="text-slate-500 dark:text-slate-400">Complete your profile to generate your unique
+                        humanitarian rescue QR code.</p>
+                </section>
+                <!-- Progress Indicator -->
+                <nav class="flex items-center gap-4 mb-8">
+                    <div class="flex items-center gap-2">
+                        <span
+                            class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">1</span>
+                        <span class="text-sm font-semibold text-primary">Personal Details</span>
+                    </div>
+                    <div class="flex-1 h-px bg-primary/20"></div>
+                    <div class="flex items-center gap-2 opacity-50">
+                        <span
+                            class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center font-bold text-sm">2</span>
+                        <span class="text-sm font-semibold">Verification</span>
+                    </div>
+                </nav>
+                <form class="space-y-10">
+                    <!-- Photo Upload Section -->
+                    <div class="space-y-4">
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Identification
+                            Photo</label>
+                        <div class="relative group cursor-pointer">
+                            <div
+                                class="border-2 border-dashed border-primary/30 group-hover:border-primary/60 transition-colors bg-primary/5 rounded-xl p-8 flex flex-col items-center justify-center text-center">
+                                <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                                    <span class="material-icons text-primary text-3xl">photo_camera</span>
+                                </div>
+                                <h3 class="text-lg font-semibold mb-1">Upload Photo</h3>
+                                <p class="text-sm text-slate-500 dark:text-slate-400 max-w-xs">Clear face photo with
+                                    neutral background. Max file size 5MB (JPG, PNG).</p>
+                                <input class="absolute inset-0 opacity-0 cursor-pointer" type="file" />
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Personal Information -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2 col-span-2">
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300"
+                                for="full-name">Full Name</label>
+                            <input
+                                class="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                                id="fname" placeholder="Enter your full legal name" type="text" />
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300" for="dob">Date
+                                of Birth</label>
+                            <input
+                                class="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                                id="dob" type="date" />
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300"
+                                for="gender">Blood Type (Optional)</label>
+                            <select
+                                class="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                                id="gender">
+                                <option value="">Select Type</option>
+                                <option>A+</option>
+                                <option>A-</option>
+                                <option>B+</option>
+                                <option>B-</option>
+                                <option>AB+</option>
+                                <option>AB-</option>
+                                <option>O+</option>
+                                <option>O-</option>
+                            </select>
+                        </div>
+                    </div>
+                    <!-- Medical & Background -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300" for="bio">Emergency
+                            Bio / Special Instructions</label>
+                        <textarea
+                            class="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                            id="bio" placeholder="List chronic illnesses, allergies, or regular medications..."
+                            rows="4"></textarea>
+                    </div>
+                    <!-- Emergency Contact Links -->
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Social Media
+                                &amp; Contact Links</label>
+                            <button class="text-primary text-sm font-semibold flex items-center gap-1 hover:underline"
+                                type="button">
+                                <span class="material-icons text-base">add_circle</span>
+                                Add Another
+                            </button>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex gap-3">
+                                <div class="relative flex-1">
+                                    <span
+                                        class="absolute left-3 top-1/2 -translate-y-1/2 material-icons text-slate-400 text-lg">whatsapp</span>
+                                    <input
+                                        class="w-full pl-10 pr-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                                        id="number" placeholder="WhatsApp Number" type="text" />
+                                </div>
+                                <button class="px-4 py-3 text-slate-400 hover:text-red-500 transition-colors"
+                                    type="button">
+                                    <span class="material-icons">delete_outline</span>
+                                </button>
+                            </div>
+                            <div class="flex gap-3">
+                                <div class="relative flex-1">
+                                    <span
+                                        class="absolute left-3 top-1/2 -translate-y-1/2 material-icons text-slate-400 text-lg">facebook</span>
+                                    <input
+                                        class="w-full pl-10 pr-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                                        id="facebook" placeholder="Facebook Profile Link" type="text" />
+                                </div>
+                                <button class="px-4 py-3 text-slate-400 hover:text-red-500 transition-colors"
+                                    type="button">
+                                    <span class="material-icons">delete_outline</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Submission -->
+                    <div class="pt-6">
+                        <button
+                            class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/20 flex items-center justify-center gap-3 transition-all"
+                            onclick="displayQR(event)" type="submit">
+                            <span class="material-icons">security</span>
+                            Generate My Secure ID
+                        </button>
+                        <p class="text-center text-xs text-slate-500 dark:text-slate-500 mt-4">By generating this ID,
+                            you agree to our emergency data protocols and privacy terms.</p>
+                    </div>
+                </form>
+
+                <div id="qr-container" style="display:none; text-align:center; margin-top:20px;">
+                    <h3>Your Personal QR Code</h3>
+                    <img id="qrImage" src="" alt="QR Code" style="border: 1px solid #ccc; padding: 10px;">
+                    <br>
+                    <button onclick="window.print()">Print Code</button>
+                </div>
+
+            </div>
+            <!-- Sidebar Context -->
+            <aside class="lg:col-span-4 lg:sticky lg:top-24 space-y-6">
+                <!-- Info Card 1 -->
+                <div class="bg-primary/10 border border-primary/20 p-6 rounded-xl">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                            <span class="material-icons text-white">speed</span>
+                        </div>
+                        <h3 class="font-bold text-lg">Seconds Matter</h3>
+                    </div>
+                    <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                        In the event of a disaster or rescue operation, emergency responders can scan your QR code to
+                        instantly access your vital information, even when you are unable to speak.
+                    </p>
+                </div>
+                <!-- Info Card 2 -->
+                <div class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-xl">
+                    <h4 class="font-bold mb-4 flex items-center gap-2">
+                        <span class="material-icons text-primary text-sm">shield</span>
+                        How We Use Your Data
+                    </h4>
+                    <ul class="space-y-4">
+                        <li class="flex gap-3">
+                            <span class="material-icons text-primary text-base">check_circle</span>
+                            <div>
+                                <p class="text-sm font-semibold">Offline Access</p>
+                                <p class="text-xs text-slate-500">Essential data is embedded in the QR for offline
+                                    rescue team access.</p>
+                            </div>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="material-icons text-primary text-base">check_circle</span>
+                            <div>
+                                <p class="text-sm font-semibold">Immediate Notification</p>
+                                <p class="text-xs text-slate-500">Your emergency contacts are alerted the moment the
+                                    code is scanned by authorized personnel.</p>
+                            </div>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="material-icons text-primary text-base">check_circle</span>
+                            <div>
+                                <p class="text-sm font-semibold">Secure Storage</p>
+                                <p class="text-xs text-slate-500">Military-grade encryption for all medical and personal
+                                    history.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Visual Element -->
+                <div class="relative h-48 rounded-xl overflow-hidden shadow-xl">
+                    <img alt="Humanitarian Aid Efforts" class="w-full h-full object-cover"
+                        data-alt="Rescue workers using digital tablets in a camp"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzjNHc2ur8IlhrSnzZWkX4JPkw6kRYOLKDjcqk4lVKq7Zsr4TcxVt6HKJblTQPBAa-6X655PuJ_RZN3ERzxmO8Pab6EMzut1ouY6MgEmaoHqIBlpW-mZxiKj7CRK_CYVh3hLmQB-Dl3eiFwa1Bap3wMcUW3m6iI2qSLvHZ24WmIGpC8-UOBr7_zTVXl82oaIysjFLO2psuN-PPpdrpcj1q20Lwv2bwVTjXGAxwInDlhqOV-_GEIuLbaIibJvWTQIIDolEDit9g8KA" />
+                    <div
+                        class="absolute inset-0 bg-gradient-to-t from-background-dark/80 to-transparent flex items-end p-4">
+                        <div class="text-white">
+                            <p class="text-[10px] uppercase font-bold tracking-wider opacity-70 mb-1">Impact Report</p>
+                            <p class="text-xs font-medium">Over 10,000+ IDs generated for active recovery zones.</p>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    class="bg-slate-50/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 p-4 rounded-xl flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="flex -space-x-2">
+                            <img alt="User" class="w-8 h-8 rounded-full border-2 border-background-dark"
+                                data-alt="Volunteer 1 profile"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2cBSpkufmWHlkOJ7RzubvHVIZeOT2n75Lxy-WPNlNbzTqU_W0S0vENTCdDqHk6WN-PPFT4eqt6lepHVqJXXzveYP3BtALzvYRiCLEsn6UXuwvFUJDE883Do-LU1XFYp9TwLrhSwm3zdayPJJ96LtBYr3R1dtkp52z_KqMPMXIVY5nDU07x32E3chJ4CEgpPO3efR4CoEM7-EYXjY3dNg4KWgydgd85CoBYxF-yIYm3zjkj47TNyLiUyVaF8N7pLaIcoFuWMTLa24" />
+                            <img alt="User" class="w-8 h-8 rounded-full border-2 border-background-dark"
+                                data-alt="Volunteer 2 profile"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAq72UuI68UwO_vOehzxVdOYgvMFJKB5tYn10SvQENR5TNinWgREmjQPdfKswzTJFO4myJFLSa3duTj6NtEhTavtzG0bUDM-PqZSKG-FivqcEVFiUzua9cIBx_gFhiosoSP91w2byV1KG_wSurO_8GXgECto5cII-RimcIwIw1uzO9QurnoZYpVgbH46yvdPt5Ici4IFRwjblmmw6PkGHrhTGdheoAoaufHtTlUssgpaWRXZJX1DlATwampSKJXeo9isLJrp5hy3oU" />
+                            <div
+                                class="w-8 h-8 rounded-full bg-slate-800 border-2 border-background-dark flex items-center justify-center text-[10px] font-bold">
+                                +2k</div>
+                        </div>
+                        <span class="text-xs font-medium">Recent registrations</span>
+                    </div>
+                    <span class="flex h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
+                </div>
+            </aside>
+        </div>
+    </main>
+    <footer class="mt-20 border-t border-slate-200 dark:border-slate-800 py-8">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="text-slate-500 text-sm">
+                © 2024 RESCUEID Global Humanitarian Platform.
+            </div>
+            <div class="flex items-center gap-6">
+                <a class="text-slate-500 hover:text-primary transition-colors text-sm" href="#">Privacy Policy</a>
+                <a class="text-slate-500 hover:text-primary transition-colors text-sm" href="#">Terms of Use</a>
+                <a class="text-slate-500 hover:text-primary transition-colors text-sm" href="#">Contact Support</a>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>
